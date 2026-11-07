@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Un Laberinto de Versos</title>
+  <style>
+    :root {
+      --bg-color: #fff2f2;
+      --card-bg: #ffffff;
+      --primary-color: #e65c7b;
+      --primary-hover: #cb3b5b;
+      --text-color: #4a3737;
+      --accent-color: #ffb3c1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: Georgia, serif;
+      background-color: var(--bg-color);
+      background-image: radial-gradient(var(--accent-color) 1px, transparent 0);
+      background-size: 24px 24px;
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(230, 92, 123, 0.15);
+      border: 2px solid rgba(255, 179, 193, 0.4);
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      transition: all 0.4s ease;
+    }
+
+    .container::before {
+      content: "♥";
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary-color);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: var(--primary-color);
+      font-size: 1.8rem;
+      margin-top: 10px;
+      margin-bottom: 25px;
+      font-family: "Segoe UI", sans-serif;
+      font-weight: 600;
+    }
+
+    p {
+      line-height: 1.8;
+      font-size: 1.1rem;
+      color: #5c4646;
+    }
+
+    .poem-verse {
+      font-style: italic;
+      font-size: 1.25rem;
+      color: #9c3d52;
+      margin: 30px 0;
+      line-height: 2;
+      background: #fff9f9;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid var(--primary-color);
+      text-align: center;
+    }
+
+    .btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-family: "Segoe UI", sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      box-shadow: 0 5px 15px rgba(230, 92, 123, 0.3);
+      margin: 8px 4px 0;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: #a9878e;
+      box-shadow: 0 5px 15px rgba(100, 70, 70, 0.15);
+    }
+
+    .btn-secondary:hover { background: #896a71; }
+
+    .hint {
+      font-size: 0.95rem;
+      color: #8c6b6b;
+      margin-top: 35px;
+      border-top: 2px dashed #ffd1dc;
+      padding-top: 20px;
+      font-family: "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    .game-section {
+      margin-top: 30px;
+      text-align: left;
+    }
+
+    .select-row {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #faf5f5;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid #eedede;
+    }
+
+    .select-row label {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #7c5a5a;
+      font-family: "Segoe UI", sans-serif;
+      flex-shrink: 0;
+    }
+
+    select {
+      padding: 9px;
+      border-radius: 5px;
+      border: 1px solid var(--accent-color);
+      background-color: white;
+      font-family: Georgia, serif;
+      width: 72%;
+      min-width: 0;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+
+    .result-message {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 10px;
+      display: none;
+      font-family: "Segoe UI", sans-serif;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      font-size: 1.15rem;
+      font-weight: bold;
+      text-align: center;
+      animation: pop 0.5s ease;
+    }
+
+    .error-box {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .error-title { font-weight: bold; margin-bottom: 8px; }
+    .error-box ul { margin: 0; padding-left: 20px; font-size: 0.95rem; }
+    .final-poem { margin-top: 22px; }
+
+    @keyframes pop {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 520px) {
+      body { padding: 14px; }
+      .container { padding: 34px 18px 25px; }
+      h1 { font-size: 1.5rem; }
+      .select-row { align-items: stretch; flex-direction: column; gap: 7px; }
+      select { width: 100%; max-width: 100%; }
+      .poem-verse { font-size: 1.1rem; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container" id="app" aria-live="polite"></main>
+
+  <script>
+    // Las estrofas completas se reutilizan tanto en las páginas como en el juego.
+    const estrofas = {
+      1: `No sé exactamente qué tienes,
+pero cambias el ritmo de mis horas.
+Llegas, sonríes y, sin darte cuenta,
+desarmas mis inviernos y los decoras.`,
+      2: `Es ver tu nombre en la pantalla
+y sentir un brinco tonto en el pecho,
+es buscar cualquier excusa boba
+para quedarme cerca, al acecho
+de tu risa, de tus manos, de tu voz.`,
+      3: `Me gusta el mundo cuando estás cerca,
+porque todo se vuelve más ligero, más brillante.
+Eres ese pensamiento constante y bonito
+que me acompaña a cada instante.`,
+      4: `No me preguntes a dónde vamos,
+ni le pongamos un nombre a esto que crece;
+solo sé que si el día amanece contigo,
+la vida entera me favorece.`,
+      5: `Te has vuelto mi rincón favorito,
+mi tregua, mi paz y mi mejor casualidad.
+No sé cómo llamarlo, ni hace falta,
+pero estar contigo es mi felicidad.`
+    };
+
+    const pistasErrores = {
+      1: "La primera estrofa debe iniciar hablando sobre cómo cambia el ritmo del tiempo y las horas.",
+      2: "La segunda parte reacciona al mundo digital: busca lo que provoca ver un nombre en la pantalla.",
+      3: "El tercer fragmento describe cómo cambia el mundo exterior y se vuelve más ligero cuando está cerca.",
+      4: "El cuarto verso pide no poner nombres ni preguntar hacia dónde avanza el destino.",
+      5: "El gran cierre debe terminar hablando sobre encontrar su rincón favorito y su felicidad."
+    };
+
+    const paginas = {
+      principal: {
+        titulo: "Un Laberinto de Versos",
+        contenido: "He escondido un poema para ti, pero el viento ha soplado fuerte y ha dejado sus páginas completamente desordenadas.<br><br>Para descubrirlo, tendrás que viajar a través de los enlaces recolectando los versos y descifrando las pistas. Al final, tendrás que demostrar si lograste armar el rompecabezas.",
+        botonTexto: "Empezar el viaje",
+        siguiente: "verso3"
+      },
+      verso3: {
+        titulo: "Fragmento Perdido en la Bruma",
+        estrofa: 3,
+        pista: "💡 Pista del viento: Has caído en medio del viaje. El verdadero inicio del poema se encuentra donde se altera el ritmo del tiempo.",
+        botonTexto: "Buscar el origen",
+        siguiente: "verso1"
+      },
+      verso1: {
+        titulo: "Fragmento Encontrado al Amanecer",
+        estrofa: 1,
+        pista: "💡 Pista del viento: El compás ha comenzado. Ahora busca el fragmento donde el pecho da un vuelco al iluminarse una pantalla.",
+        botonTexto: "Seguir el rastro",
+        siguiente: "verso2"
+      },
+      verso2: {
+        titulo: "Fragmento Detrás del Espejo",
+        estrofa: 2,
+        pista: "💡 Pista del viento: Vas por buen camino. Salta hacia el fragmento que ya leíste anteriormente para avanzar al desenlace.",
+        botonTexto: "Continuar el viaje",
+        siguiente: "verso4"
+      },
+      verso4: {
+        titulo: "Fragmento Rescatado del Olvido",
+        estrofa: 4,
+        pista: "💡 Pista del viento: El viaje termina directo en tu rincón favorito.",
+        botonTexto: "Ir al destino final",
+        siguiente: "verso5"
+      },
+      verso5: {
+        titulo: "El Último Fragmento",
+        estrofa: 5,
+        pista: "✨ Has alcanzado el final del laberinto... ¿pero recuerdas el orden correcto?",
+        botonTexto: "Armar el Poema Completo",
+        siguiente: "juegoFinal"
+      }
+    };
+
+    function escaparHTML(texto) {
+      return String(texto).replace(/[&<>"']/g, caracter => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[caracter]);
+    }
+
+    function formatoVerso(texto) {
+      return escaparHTML(texto).replace(/\n/g, "<br>");
+    }
+
+    function irAPagina(idPagina) {
+      const contenedor = document.getElementById("app");
+
+      if (idPagina === "juegoFinal") {
+        mostrarJuegoFinal(contenedor);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      const datos = paginas[idPagina];
+      if (!datos) {
+        contenedor.innerHTML = "<h1>Ups...</h1><p>No se encontró esta página.</p>";
+        return;
+      }
+
+      let html = `<h1>${datos.titulo}</h1>`;
+
+      if (datos.contenido) html += `<p>${datos.contenido}</p>`;
+      if (datos.estrofa) {
+        html += `<div class="poem-verse">${formatoVerso(estrofas[datos.estrofa])}</div>`;
+      }
+      if (datos.pista) html += `<div class="hint">${datos.pista}</div>`;
+
+      html += `<button class="btn" style="margin-top:20px" onclick="irAPagina('${datos.siguiente}')">${datos.botonTexto}</button>`;
+      contenedor.innerHTML = html;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function mostrarJuegoFinal(contenedor) {
+      let html = `
+        <h1>¿Puedes ordenarlo?</h1>
+        <p>Selecciona qué estrofa va en cada posición para reconstruir nuestra historia:</p>
+        <div class="game-section">
+      `;
+
+      for (let i = 1; i <= 5; i++) {
+        html += `
+          <div class="select-row">
+            <label for="pos-${i}">Estrofa ${i}:</label>
+            <select id="pos-${i}" name="pos-${i}" onchange="actualizarOpciones()">
+              <option value="">-- Selecciona un fragmento --</option>
+              ${Object.entries(estrofas).map(([numero, texto]) =>
+                `<option value="${numero}">Fragmento ${numero}: ${escaparHTML(texto.replace(/\n/g, " ").slice(0, 55))}...</option>`
+              ).join("")}
+            </select>
+          </div>
+        `;
+      }
+
+      html += `
+        </div>
+        <button class="btn" onclick="verificarOrden()">Comprobar mi respuesta</button>
+        <button class="btn btn-secondary" onclick="irAPagina('principal')">Volver al inicio</button>
+        <div id="resultado" class="result-message" role="status"></div>
+      `;
+
+      contenedor.innerHTML = html;
+      actualizarOpciones();
+    }
+
+    // Evita que una misma estrofa sea elegida en más de una posición.
+    function actualizarOpciones() {
+      const selects = Array.from({ length: 5 }, (_, i) =>
+        document.getElementById(`pos-${i + 1}`)
+      ).filter(Boolean);
+
+      const seleccionados = selects.map(select => select.value).filter(Boolean);
+
+      selects.forEach(select => {
+        Array.from(select.options).forEach(option => {
+          if (!option.value) return;
+          option.disabled = seleccionados.includes(option.value) && select.value !== option.value;
+        });
+      });
+    }
+
+    function verificarOrden() {
+      const resultadoDiv = document.getElementById("resultado");
+      const respuestas = [];
+
+      for (let i = 1; i <= 5; i++) {
+        const selector = document.getElementById(`pos-${i}`);
+        if (!selector || !selector.value) {
+          resultadoDiv.className = "result-message error-box";
+          resultadoDiv.style.display = "block";
+          resultadoDiv.innerHTML = "⚠️ ¡Espera! Selecciona una estrofa para cada una de las cinco posiciones antes de comprobar.";
+          return;
+        }
+        respuestas.push(Number(selector.value));
+      }
+
+      if (new Set(respuestas).size !== 5) {
+        resultadoDiv.className = "result-message error-box";
+        resultadoDiv.style.display = "block";
+        resultadoDiv.innerHTML = "⚠️ No puedes repetir una misma estrofa. Cada fragmento debe utilizarse una sola vez.";
+        return;
+      }
+
+      const errores = [];
+      respuestas.forEach((valor, indice) => {
+        const posicion = indice + 1;
+        if (valor !== posicion) errores.push(posicion);
+      });
+
+      if (errores.length === 0) {
+        resultadoDiv.className = "result-message success";
+        resultadoDiv.style.display = "block";
+        resultadoDiv.innerHTML = `
+          ✨ ¡FELICIDADES, ERES HERMOSA! ✨
+          <p>Lograste unir cada verso en el orden exacto de mi corazón.</p>
+          <div class="poem-verse final-poem">
+            ${Object.values(estrofas).map(formatoVerso).join("<br><br>")}
+          </div>
+          <p>Hay historias que no necesitan un mapa; basta con encontrar a la persona correcta. ♥</p>
+        `;
+      } else {
+        resultadoDiv.className = "result-message error-box";
+        resultadoDiv.style.display = "block";
+
+        let htmlErrores = `<div class="error-title">Casi lo tienes, pero hay algunos desajustes. Aquí tienes tus pistas:</div><ul>`;
+        errores.forEach(posicion => {
+          htmlErrores += `<li><strong>En la posición ${posicion}:</strong> ${pistasErrores[posicion]}</li>`;
+        });
+        htmlErrores += "</ul>";
+        resultadoDiv.innerHTML = htmlErrores;
+      }
+    }
+
+    irAPagina("principal");
+  </script>
+</body>
+</html>
