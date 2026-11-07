@@ -214,7 +214,6 @@
   <main class="container" id="app" aria-live="polite"></main>
 
   <script>
-    // Las estrofas completas se reutilizan tanto en las páginas como en el juego.
     const estrofas = {
       1: `No sé exactamente qué tienes,
 pero cambias el ritmo de mis horas.
@@ -365,7 +364,6 @@ pero estar contigo es mi felicidad.`
       actualizarOpciones();
     }
 
-    // Evita que una misma estrofa sea elegida en más de una posición.
     function actualizarOpciones() {
       const selects = Array.from({ length: 5 }, (_, i) =>
         document.getElementById(`pos-${i + 1}`)
